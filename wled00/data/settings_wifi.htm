@@ -3,177 +3,174 @@
 <head>
   <meta charset="utf-8">
 	<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
-	<title>WiFi Settings</title>
+	<title>WIFI Settings</title>
 	<script src="common.js" async type="text/javascript"></script>
 	<script>
-	var scanLoops = 0, preScanSSID = "";
-	var maxNetworks = 3;
-	function N() {
-		const button = gId("scan");
-		button.disabled = true;
-		button.textContent = "Scanning...";
+		var scanLoops = 0, preScanSSID = "";
+		var maxNetworks = 3;
+		function N() {
+			const button = gId("scan");
+			button.disabled = true;
+			button.textContent = "Scanning...";
 
-		fetch(getURL("/json/net")).then((response) => {
-			return response.json();
-		}).then((json) => {
-			// Get the list of networks only, defaulting to an empty array.
-			return Object.assign(
-				{},
-				{"networks": []},
-				json,
-			).networks.sort(
-				// Sort by signal strength, descending.
-				(a, b) => b.rssi - a.rssi
-			).reduce(
-				// Filter out duplicate SSIDs. Since it is sorted by signal
-				// strength, the strongest signal will be kept in the
-				// order it as originally appeared in the array.
-				(unique, other) => {
-					if(!unique.some(obj => obj.ssid === other.ssid)) {
-						unique.push(other);
-					}
-					return unique;
-				},
-				[],
-			);
-		}).then((networks) => {
-			// If there are no networks, fetch it again in a second.
-			// but only do this a few times.
-			if (networks.length === 0 && scanLoops < 10) {
-				scanLoops++;
-				setTimeout(N, 1000);
-				return;
-			}
-			scanLoops = 0;
+			fetch(getURL("/json/net")).then((response) => {
+				return response.json();
+			}).then((json) => {
+				// Get the list of networks only, defaulting to an empty array.
+				return Object.assign(
+					{},
+					{"networks": []},
+					json,
+				).networks.sort(
+					// Sort by signal strength, descending.
+					(a, b) => b.rssi - a.rssi
+				).reduce(
+					// Filter out duplicate SSIDs. Since it is sorted by signal
+					// strength, the strongest signal will be kept in the
+					// order it as originally appeared in the array.
+					(unique, other) => {
+						if(!unique.some(obj => obj.ssid === other.ssid)) {
+							unique.push(other);
+						}
+						return unique;
+					},
+					[],
+				);
+			}).then((networks) => {
+				// If there are no networks, fetch it again in a second.
+				// but only do this a few times.
+				if (networks.length === 0 && scanLoops < 10) {
+					scanLoops++;
+					setTimeout(N, 1000);
+					return;
+				}
+				scanLoops = 0;
 
-			if (networks.length > 0) {
-				let cs = d.querySelectorAll("#wifi_entries input[type=text]");
-				for (let input of (cs||[])) {
-					let found = false;
-					let select = cE("select");
-					select.id = input.id;
-					select.name = input.name;
-					select.setAttribute("onchange", "T(this)");
-					preScanSSID = input.value;
+				if (networks.length > 0) {
+					let cs = d.querySelectorAll("#wifi_entries input[type=text]");
+					for (let input of (cs||[])) {
+						let found = false;
+						let select = cE("select");
+						select.id = input.id;
+						select.name = input.name;
+						select.setAttribute("onchange", "T(this)");
+						preScanSSID = input.value;
 
-					for (let i = 0; i < select.children.length; i++) {
-						select.removeChild(select.children[i]);
-					}
-
-					for (let i = 0; i < networks.length; i++) {
-						const option = cE("option");
-
-						option.setAttribute("value", networks[i].ssid);
-						option.textContent = `${networks[i].ssid} (${networks[i].rssi} dBm)`;
-
-						if (networks[i].ssid === input.value) {
-							option.setAttribute("selected", "selected");
-							found = true;
+						for (let i = 0; i < select.children.length; i++) {
+							select.removeChild(select.children[i]);
 						}
 
+						for (let i = 0; i < networks.length; i++) {
+							const option = cE("option");
+
+							option.setAttribute("value", networks[i].ssid);
+							option.textContent = `${networks[i].ssid} (${networks[i].rssi} dBm)`;
+
+							if (networks[i].ssid === input.value) {
+								option.setAttribute("selected", "selected");
+								found = true;
+							}
+
+							select.appendChild(option);
+						}
+						const option = cE("option");
+
+						option.setAttribute("value", "!Cs");
+						option.textContent = "Other network...";
 						select.appendChild(option);
+
+						if (input.value === "" || input.value === "Your_Network" || found) input.replaceWith(select);
+						else select.remove(); 
 					}
-					const option = cE("option");
-
-					option.setAttribute("value", "!Cs");
-					option.textContent = "Other network...";
-					select.appendChild(option);
-
-					if (input.value === "" || input.value === "Your_Network" || found) input.replaceWith(select);
-					else select.remove(); 
 				}
-			}
 
-			button.disabled = false;
-			button.textContent = "Scan";
-		});
-	}
-	// replace WiFi select with custom SSID input field again
-	function T(cs) {
-		if (!cs || cs.value != "!Cs") return;
-		let input = cE("input");
-		input.type = "text";
-		input.id = cs.id;
-		input.name = cs.name;
-		input.setAttribute("maxlength",32);
-		input.value = preScanSSID;
-		cs.replaceWith(input);
-	}
-	function resetWiFi(maxN = undefined) {
-		if (maxN) maxNetworks = maxN;
-		let entries = gId("wifi_entries").children
-		for (let i = entries.length; i > 0; i--) entries[i-1].remove();
-		btnWiFi(0);
-	}
-	function btnWiFi(i) {
-		//gId("wifi_add").style.display = (i<maxNetworks) ? "inline":"none";
-		//gId("wifi_add").style.visibility = (i<maxNetworks) ? "hidden":"hidden";
-		//gId("wifi_add").setAttribute("hidden", true);
-		//gId("wifi_rem").style.display = (i>1) ? "inline":"none";
-		gId("wifi_add").style.display = "none"; // just hide both buttons
-		gId("wifi_rem").style.display = "none";
-	}
-	function addWiFi(ssid="",pass="",ip=0,gw=0,sn=0x00ffffff) { // little endian
-		var i = gId("wifi_entries").childNodes.length;
-		if (i >= maxNetworks) return;
-		var b = `<div id="net${i}">
-	Network:<br><input type="text" id="CS${i}" name="CS${i}" maxlength="32" style="border-radius:16px;" value="${ssid}" ${i>0?"required":""}><br>
-	Password:<br><input type="password" name="PW${i}" maxlength="64" style="border-radius:16px;" value="${pass}"><br>
-	<div id="static_ip" hidden>
-	Static IP (leave at 0.0.0.0 for DHCP)${i==0?"<br>Also used by Ethernet":""}:<br>
-	<input name="IP${i}0" type="number" class="s" min="0" max="255" value="${ip&0xFF}" required>.<input name="IP${i}1" type="number" class="s" min="0" max="255" value="${(ip>>8)&0xFF}" required>.<input name="IP${i}2" type="number" class="s" min="0" max="255" value="${(ip>>16)&0xFF}" required>.<input name="IP${i}3" type="number" class="s" min="0" max="255" value="${(ip>>24)&0xFF}" required><br>
-	Static gateway:<br>
-	<input name="GW${i}0" type="number" class="s" min="0" max="255" value="${gw&0xFF}" required>.<input name="GW${i}1" type="number" class="s" min="0" max="255" value="${(gw>>8)&0xFF}" required>.<input name="GW${i}2" type="number" class="s" min="0" max="255" value="${(gw>>16)&0xFF}" required>.<input name="GW${i}3" type="number" class="s" min="0" max="255" value="${(gw>>24)&0xFF}" required><br>
-	Static subnet mask:<br>
-	<input name="SN${i}0" type="number" class="s" min="0" max="255" value="${sn&0xFF}" required>.<input name="SN${i}1" type="number" class="s" min="0" max="255" value="${(sn>>8)&0xFF}" required>.<input name="SN${i}2" type="number" class="s" min="0" max="255" value="${(sn>>16)&0xFF}" required>.<input name="SN${i}3" type="number" class="s" min="0" max="255" value="${(sn>>24)&0xFF}" required></div></div>`;
-		gId("wifi_entries").insertAdjacentHTML("beforeend", b);
-		//btnWiFi(i+1);
-	}
-	function remWiFi() {
-		const entries = gId("wifi_entries").children;
-		const i = entries.length;
-		if (i < 2) return;
-		entries[i-1].remove();
-		btnWiFi(i-1);
-	}
-	function S() {
-		getLoc();
-		loadJS(getURL('/settings/s.js?p=1'), false);	// If we set async false, file is loaded and executed, then next statement is processed
-		if (loc) d.Sf.action = getURL('/settings/wifi');
-	}
-	// show hidden div that has all the advanced settings
-	function showAllSettings() {
-		var elements = document.querySelectorAll("[hidden]");
-    	elements.forEach(function(element) {
-        	element.removeAttribute("hidden");
-    	});
-		gId("umsg").style.display = "none";
-		gId("wifi_add").style.display = "inline";
-		gId("wifi_rem").style.display = "inline";
-	}
+				button.disabled = false;
+				button.textContent = "Scan";
+			});
+		}
+		// replace WiFi select with custom SSID input field again
+		function T(cs) {
+			if (!cs || cs.value != "!Cs") return;
+			let input = cE("input");
+			input.type = "text";
+			input.id = cs.id;
+			input.name = cs.name;
+			input.setAttribute("maxlength",32);
+			input.value = preScanSSID;
+			cs.replaceWith(input);
+		}
+		function resetWiFi(maxN = undefined) {
+			if (maxN) maxNetworks = maxN;
+			let entries = gId("wifi_entries").children
+			for (let i = entries.length; i > 0; i--) entries[i-1].remove();
+			btnWiFi(0);
+		}
+		function btnWiFi(i) {
+			//gId("wifi_add").style.display = (i<maxNetworks) ? "inline":"none";
+			//gId("wifi_add").style.visibility = (i<maxNetworks) ? "hidden":"hidden";
+			//gId("wifi_add").setAttribute("hidden", true);
+			//gId("wifi_rem").style.display = (i>1) ? "inline":"none";
+			gId("wifi_add").style.display = "none"; // just hide both buttons
+			gId("wifi_rem").style.display = "none";
+		}
+		function addWiFi(ssid="",pass="",ip=0,gw=0,sn=0x00ffffff) { // little endian
+			var i = gId("wifi_entries").childNodes.length;
+			if (i >= maxNetworks) return;
+			var b = `<div id="net${i}">
+		Network:<br><input type="text" id="CS${i}" name="CS${i}" maxlength="32" style="border-radius:16px;" value="${ssid}" ${i>0?"required":""}><br>
+		Password:<br><input type="password" name="PW${i}" maxlength="64" style="border-radius:16px;" value="${pass}"><br>
+		<div id="static_ip" hidden>
+		Static IP (leave at 0.0.0.0 for DHCP)${i==0?"<br>Also used by Ethernet":""}:<br>
+		<input name="IP${i}0" type="number" class="s" min="0" max="255" value="${ip&0xFF}" required>.<input name="IP${i}1" type="number" class="s" min="0" max="255" value="${(ip>>8)&0xFF}" required>.<input name="IP${i}2" type="number" class="s" min="0" max="255" value="${(ip>>16)&0xFF}" required>.<input name="IP${i}3" type="number" class="s" min="0" max="255" value="${(ip>>24)&0xFF}" required><br>
+		Static gateway:<br>
+		<input name="GW${i}0" type="number" class="s" min="0" max="255" value="${gw&0xFF}" required>.<input name="GW${i}1" type="number" class="s" min="0" max="255" value="${(gw>>8)&0xFF}" required>.<input name="GW${i}2" type="number" class="s" min="0" max="255" value="${(gw>>16)&0xFF}" required>.<input name="GW${i}3" type="number" class="s" min="0" max="255" value="${(gw>>24)&0xFF}" required><br>
+		Static subnet mask:<br>
+		<input name="SN${i}0" type="number" class="s" min="0" max="255" value="${sn&0xFF}" required>.<input name="SN${i}1" type="number" class="s" min="0" max="255" value="${(sn>>8)&0xFF}" required>.<input name="SN${i}2" type="number" class="s" min="0" max="255" value="${(sn>>16)&0xFF}" required>.<input name="SN${i}3" type="number" class="s" min="0" max="255" value="${(sn>>24)&0xFF}" required></div></div>`;
+			gId("wifi_entries").insertAdjacentHTML("beforeend", b);
+			btnWiFi(i+1);
+		}
+		function remWiFi() {
+			const entries = gId("wifi_entries").children;
+			const i = entries.length;
+			if (i < 2) return;
+			entries[i-1].remove();
+			btnWiFi(i-1);
+		}
+		function S() {
+			getLoc();
+			loadJS(getURL('/settings/s.js?p=1'), false);	// If we set async false, file is loaded and executed, then next statement is processed
+			if (loc) d.Sf.action = getURL('/settings/wifi');
+		}
+	</script>
+	<script>
+		function showAllSettings() { // function to unhide all hidden settings for full configuration 
+			var elements = document.querySelectorAll("[hidden]");
+			elements.forEach(function(element) {
+				element.removeAttribute("hidden");
+			});
+			gId("umsg").style.display = "none";
+			gId("scan").style.display = "inline";
+			gId("wifi_add").style.display = "inline";
+			gId("wifi_rem").style.display = "inline";
+		}
 	</script>
 	<style>@import url("style.css");</style>
 </head>
-
 <body onload="S()">
 	<form id="form_s" name="Sf" method="post">
 		<div class="toprow" style="display:none;">
 			<div class="helpB"><button type="button" onclick="H('features/settings/#wifi-settings')">?</button></div>
-			<button type="button" onclick="B()">Back</button><button type="submit">Save & Connect</button><hr>
+		<button type="button" onclick="B()">Back</button><button type="submit">Save & Connect</button><hr>
 		</div>
-		<h2 onclick="showAllSettings()" style="margin:50px 30px 30px; font-weight:400;">WIFI Setup</h2>
-		<!--<p style="margin-left:10px; margin-right:10px; line-height:normal;">For the best experience, we recommend connecting your orb to your local WIFI network</p>-->
-		<!--hide the network scan button, takes longer than just entering your network name-->
-		<button type="button" id="scan" onclick="N()" style="display:none;">Scan</button>
+		<h2 onclick="showAllSettings()" style="margin:50px 30px 20px; font-weight:400;">WIFI Setup</h2>
+		<button type="button" id="scan" onclick="N()" style="display:none;">Scan</button><br>
 		<div id="wifi">
-			<div id="wifi_entries">
-			<!--Wireless networks get populated by JS here-->
-			</div>
-			<button hidden type="button" id="wifi_add" onclick="addWiFi()">+</button>
-			<button hidden type="button" id="wifi_rem" onclick="remWiFi()">-</button>
+			<div id="wifi_entries"></div>
+			<button type="button" id="wifi_add" onclick="addWiFi()">+</button>
+			<button type="button" id="wifi_rem" onclick="remWiFi()">-</button><br>
 		</div>
-		<p id="umsg" style="margin:25px 55px 25px;">After saving, please navigate to <b>orb-mini.local/</b> on the new network to control your orb.</p>
-		<div id="advanced_settings" hidden> <!--hide all advnaced settings in a new div-->
+		<p id="umsg" style="margin:20px 55px 25px;">After saving, please navigate to <b>orb-mini.local</b> on the new network to control your orb.</p>
+		<div hidden>
 			DNS server address:<br>
 			<input name="D0" type="number" class="s" min="0" max="255" required>.<input name="D1" type="number" class="s" min="0" max="255" required>.<input name="D2" type="number" class="s" min="0" max="255" required>.<input name="D3" type="number" class="s" min="0" max="255" required><br>
 			<br>
@@ -246,7 +243,7 @@
 				</select><br><br>
 			</div>
 		</div>
-		<button type="button" onclick="window.location.href=getURL('/');">Back</button><button type="submit">Save & Connect</button>
+		<button type="button" onclick="window.location.href=getURL('../');">Back</button><button type="submit">Save & Connect</button>
 	</form>
 </body>
 </html>

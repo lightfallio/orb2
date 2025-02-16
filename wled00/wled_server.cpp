@@ -585,7 +585,7 @@ void serveSettings(AsyncWebServerRequest* request, bool post) {
     char s2[45] = "";
 
     switch (subPage) {
-      case SUBPAGE_WIFI   : strcpy_P(s, PSTR("WIFI")); strcpy_P(s2, PSTR("Please connect to the new network.")); break;
+      case SUBPAGE_WIFI   : strcpy_P(s, PSTR("WIFI")); strcpy_P(s2, PSTR("Please connect to the new network")); break;
       case SUBPAGE_LEDS   : strcpy_P(s, PSTR("LED")); break;
       case SUBPAGE_UI     : strcpy_P(s, PSTR("UI")); break;
       case SUBPAGE_SYNC   : strcpy_P(s, PSTR("Sync")); break;
@@ -609,7 +609,7 @@ void serveSettings(AsyncWebServerRequest* request, bool post) {
       if (!s2[0]) strcpy_P(s2, s_redirecting);
 
       bool redirectAfter9s = (subPage == SUBPAGE_WIFI || ((subPage == SUBPAGE_SEC || subPage == SUBPAGE_UM) && doReboot));
-      serveMessage(request, (correctPIN ? 200 : 401), s, s2, redirectAfter9s ? 129 : (correctPIN ? 1 : 3));
+      serveMessage(request, (correctPIN ? 200 : 401), s, s2, redirectAfter9s ? 125 : (correctPIN ? 1 : 3));
       return;
     }
   }

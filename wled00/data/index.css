@@ -750,7 +750,8 @@ img {
 	position: absolute;
 	top: 12px; left: 8px; right: 8px;
 	height: 5px;
-	background: var(--c-6);
+	/*background: var(--c-6);*/
+	background: #222;
 	border-radius: 16px;
 	pointer-events: none;
 	z-index: -1;
@@ -776,7 +777,7 @@ img {
 	position: absolute;
 	display: inline-block;
 	border-radius: 16px;
-	background: var(--c-3); /* changing to --c-4 creates a wled_server.cpp error */
+	background: var(--c-3);
 	color: var(--c-f);
 	padding: 4px;
 	font-size: 14px;
