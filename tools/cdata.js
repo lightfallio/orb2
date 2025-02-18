@@ -171,7 +171,8 @@ async function specToChunk(srcDir, s) {
     }
   } else if (s.method == "binary") {
     const result = hexdump(buf);
-    chunk += `const uint16_t ${s.name}_length = ${buf.length};\n`;
+    // changing to uint32 to avoid overflow issue with favicon size
+    chunk += `const uint32_t ${s.name}_length = ${buf.length};\n`;
     chunk += `const uint8_t ${s.name}[] PROGMEM = {\n${result}\n};\n\n`;
     return chunk;
   }

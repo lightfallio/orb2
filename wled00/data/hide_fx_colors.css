@@ -1,4 +1,7 @@
-/* list of EFFECTS to HIDE ---------------------------------------------------------------------- */
+/* This file allows us to hide or change the display names of color palettes, effects, and presets from the user */
+
+
+/* EFFECTS to HIDE ---------------------------------------------------------------------- */
 /* the id for each effect name can be found in fx.h file, starting on line 134 */
 /* or use this convenient tool: https://jeffmission.com/wledcss/ */
 
@@ -7,26 +10,66 @@ div#fxlist [data-id="35"] { display: none; }
 /* hide exploding fireworks */
 div#fxlist [data-id="90"] { display: none; }
 
-
-/* list of NAME CHANGES to EFFECTS -------------------------------------------------------------- */
-/* note this also removes filter icons like the palette, grid, and music notes. But does filter still work?
+/* NAME CHANGES to EFFECTS -------------------------------------------------------------- */
+/* note this also removes filter icons like the palette, grid, and music notes. Filter still works */
 
 /* change "Candle Multi" to "Shimmer" */
 div#fxlist [data-id="102"] .lstIname { color: transparent; position:relative; } /* make default name transparent and move it out of way */
 div#fxlist [data-id="102"] .lstIname::after { content:"Shimmer"; color:#fff; position:absolute; width:100%; left:50%; transform:translateX(-50%);} /* replace name with our own
 
 
-/* list of COLOR PALETTES to HIDE -------------------------------------------------------------- */
+
+
+
+/* COLOR PALETTES to HIDE -------------------------------------------------------------- */
 /* the id for each effect name can be found in palettes.h file, starting on line 870. It's the first number in the comment. */
 
 div#pallist [data-id="26"] { display: none; } /* hide beech */
 div#pallist [data-id="48"] { display: none; } /* hide C9 */
 div#pallist [data-id="52"] { display: none; } /* hide C9 2 */
+div#pallist [data-id="35"] { display: none; } /* hide Fire since we made our own custom palette to replace it */
+
+/* hide custom palettes 2 through 4, at least until we use them */
+div#pallist [data-id="253"] { display: none; } /* hide custom 2 */
+div#pallist [data-id="252"] { display: none; } /* hide custom 3 */
+div#pallist [data-id="251"] { display: none; } /* hide custom 4 */
 
 
-/* list of NAME CHANGES to COLOR PALETTES ------------------------------------------------------- */
+/* NAME CHANGES to COLOR PALETTES ------------------------------------------------------- */
 /* note this also lets us assign names to our custom palettes */
+/* the list is sorted alphabetically by the WLED default name, making our changes out of order. to do - see if we can fix this */
 
 /* change "C9 New" to "Vivid" */
 div#pallist [data-id="53"] .lstIname { color: transparent; position:relative; } /* make default name transparent and move it out of way */
 div#pallist [data-id="53"] .lstIname::after { content:"Vivid"; color:#fff; position:absolute; width:100%; left:50%; transform:translateX(-50%);} /* replace name with our own */
+
+/* assign names to custom palettes
+/* change "~ Custom 0 ~" to "Kelvin Whites" */
+div#pallist [data-id="255"] .lstIname { color: transparent; position:relative; } /* make default name transparent and move it out of way */
+div#pallist [data-id="255"] .lstIname::after { content:"Kelvin Whites"; color:#fff; position:absolute; width:100%; left:50%; transform:translateX(-50%);} /* replace name with our own
+/* change "~ Custom 1 ~" to "FIRE" */
+div#pallist [data-id="254"] .lstIname { color: transparent; position:relative; } /* make default name transparent and move it out of way */
+div#pallist [data-id="254"] .lstIname::after { content:"Fire"; color:#fff; position:absolute; width:100%; left:50%; transform:translateX(-50%);} /* replace name with our own
+
+
+/* PRESETS to HIDE -------------------------------------------------------------- */
+/* the id for each preset is shown at the bottom of the preset dropdown */
+/* to reveal a hidden preset, use document.getElementById("p102o").style.display = "block"; command in a browser console 
+
+/* hide preset ids 100-110, reserve these for hardware controls like button actions, fan toggle, overtemp response, etc */
+div#pcont [id="p100o"] { display: none; }    /* button 1 short press, toggle LEDs on/off */
+div#pcont [id="p100api"] { display: block; } /* since parent div is hidden, no need to hide sub-div API text */
+div#pcont [id="p101o"] { display: none; }    /* button 1 double press, cycle between presets 2-10 */
+div#pcont [id="p101api"] { display: block; }
+div#pcont [id="p102o"] { display: none; }    /* button 1 long press, TBD */
+div#pcont [id="p102api"] { display: block; }
+div#pcont [id="p103o"] { display: none; }    /* PWM ch0 100% duty cycle */
+div#pcont [id="p103api"] { display: block; }
+div#pcont [id="p104o"] { display: none; }    /* PWM ch0 0% duty cycle */
+div#pcont [id="p104api"] { display: block; }
+div#pcont [id="p105o"] { display: none; }
+div#pcont [id="p106o"] { display: none; }
+div#pcont [id="p107o"] { display: none; }
+div#pcont [id="p108o"] { display: none; }
+div#pcont [id="p109o"] { display: none; }
+div#pcont [id="p110o"] { display: none; }

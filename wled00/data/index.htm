@@ -6,7 +6,7 @@
 	<meta name="theme-color" content="#222222">
 	<meta content="yes" name="apple-mobile-web-app-capable">
 	<!-- update favicon icon below -->
-	<link rel="shortcut icon" href="lightfall_favicon.ico"/>
+	<link rel="shortcut icon" href="favicon.ico"/>
 	<title>Lightfall</title>
 	<link rel="stylesheet" href="index.css">
 </head>
@@ -367,7 +367,7 @@
 
 <!-- INFO MODAL -->
 <div id="info" class="modal">
-	<button class="btn btn-xs close" onclick="toggleInfo()" style="margin:8px;"><i class="icons rot45">&#xe18a;</i></button>
+	<button class="btn btn-xs close" onclick="toggleInfo()" style="margin:8px; z-index:10;"><i class="icons rot45">&#xe18a;</i></button>
 	<!-- hide the WLED logo -->
 	<div hidden id="imgw">
 		<img class="wi" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAFCAYAAAC5Fuf5AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABbSURBVChTlY9bDoAwDMNW7n9nwCipytQN4Z8tbrTHmDmF4oPzyldwRqp1SSdnV/NuZuzqerAByxXznBw3igkeFEfXyUuhK/yFM0CxJfyqXZEOc6/Sr9/bf7uIC5Nwd7orMvAPAAAAAElFTkSuQmCC" />
@@ -398,9 +398,9 @@
 	<br>
 	<button class="btn ibtn" onclick="window.open(getURL('/update'),'_self');">Update</button>
 	<button class="btn ibtn" onclick="toggleNodes()">Feedback</button>
-	<div id="kv">Loading...</div>
 	<button class="btn ibtn" onclick="requestJson()">Refresh</button>
 	<button class="btn ibtn" id="resetbtn" onclick="cnfReset()">Reboot</button>
+	<div id="kv">Loading...</div>
 	<!-- hide the WLED line -->
 	<span hidden class="h">Made with&#32;<span id="heart">&#10084;&#xFE0E;</span>&#32;by&#32;<a href="https://github.com/Aircoookie/" target="_blank">Aircoookie</a>&#32;and the&#32;<a href="https://wled.discourse.group/" target="_blank">WLED community</a></span>
 </div>

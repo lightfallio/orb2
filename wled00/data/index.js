@@ -621,6 +621,7 @@ function populateQL()
 	gId('pql').innerHTML = cn;
 }
 
+// update populatePresets to hide presets with "hide" in their name. For actions we want to hide from user.
 function populatePresets(fromls)
 {
 	if (fromls) pJson = JSON.parse(localStorage.getItem("wledP"));
@@ -638,10 +639,11 @@ function populatePresets(fromls)
 		var qll = key[1].ql;
 		if (qll) pQL.push([i, qll, pName(i)]);
 		is.push(i);
-
+		// if pName(i) contains "hide" then add hidden attribute to parent div line below, else use line below as is
+		// also do not hide API sub-div if parent div is hidden. This way API cmd is edittable when secret unhide button is used 
 		cn += `<div class="pres lstI" id="p${i}o">`;
 		if (cfg.comp.pid) cn += `<div class="pid">${i}</div>`;
-		cn += `<div class="pname lstIname" onclick="setPreset(${i})">${i==lastinfo.leds.bootps?"<i class='icons btn-icon'>&#xe410;</i>":""}${isPlaylist(i)?"<i class='icons btn-icon'>&#xe139;</i>":""}${pName(i)}
+		cn += `<div class="pname lstIname" onclick="setPreset(${i})">${i==lastinfo.leds.bootps?"<i class='icons_sm'>&#xe9d9;</i>":""}${isPlaylist(i)?"<i class='icons btn-icon'>&#xe139;</i>":""}${pName(i)}
 	<i class="icons edit-icon flr" id="p${i}nedit" onclick="tglSegn(${i+100})">&#xe2c6;</i></div>
 	<i class="icons e-icon flr" id="sege${i+100}" onclick="expand(${i+100})">&#xe395;</i>
 	<div class="presin lstIcontent" id="seg${i+100}"></div>
